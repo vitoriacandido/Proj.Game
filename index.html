@@ -1,34 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/script.js" defer></script>
-
-    <title>Mario Jump</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo com JavaScript</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-    <div class="game-board">
-   <img src="pipe" alt="pipe">
-    </div>
-
-    <footer class="bg-dark text-white text-center py-4">
-  <div class="container">
-    <p class="mb-2">New Vih</p>
-    <div>
-      <a href="https://github.com/vitoriacandido/Proj.Game.git" target="_blank" class="text-white me-3">
-        <i class="bi bi-github" style="font-size: 1.5rem;"></i>
-      </a>
-      <a href="https://getbootstrap.com/" target="_blank" class="text-white">
-        <i class="bi bi-bootstrap" style="font-size: 1.5rem;"></i>
-      </a>
-    </div>
+  <div class="game-board" onclick="jump()">
+    <img src="img/mario.gif" class="mario" alt="Mario" title="Mario" />
+    <img src="img/pipe.png" class="pipe" alt="Pipe" title="Pipe" />
+    <div class="score">Pontos: <span id="score">0</span></div>
+    <button id="restart-btn" type="button" onclick="restartGame()">Reiniciar</button>
   </div>
-</footer>
 
+  <audio id="jump-sound" src="audio/audio jump.mp3"></audio>
+  <audio id="gameover-sound" src="audio/audio game over.mp3"></audio>
 
+  <script src="js/script.js"></script>
 </body>
-</html>
+
+<script>
+  let score = 0;
+  let isJumping = false;
+  let gameInterval;
+
+  function jump() {
+    if (isJumping) return;
+    isJumping = true;
+    const mario = document.querySelector('.mario');
+    mario.classList.add('jump');
+    document.getElementById('jump-sound').play();
+
+    setTimeout(() => {
+      mario.classList.remove('jump');
+      isJumping = false;
+    }, 500);
+  }
+
+  function startGame() {
+    gameInterval = setInterval(() => {
+      const pipe = document.querySelector('.pipe');
+      const mario = document.querySelector('.mario');
+
+      const pipePosition = pipe.offsetLeft;
+      const marioPosition = parseInt(window.getComputedStyle(mario).bottom);
+
+      if (pipePosition < 50 && pipePosition > 0 && marioPosition < 100) {
+        clearInterval(gameInterval);
+        document.getElementById('gameover-sound').play();
+        alert('Game Over! Pontos: ' + score);
+        restartGame();
+      } else if (pipePosition < 0) {
+        score++;
+        document.getElementById('score').innerText = score;
+      }
+    }, 20);
+  }
+
+  function restartGame() {
+    clearInterval(gameInterval);
+    score = 0;
+    document.getElementById('score').innerText = score;
+    document.querySelector('.pipe').style.left = '100%';
+    startGame();
+  }
+
+  window.onload = startGame;
+</script>
+</html> 
